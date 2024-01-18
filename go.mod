@@ -6,6 +6,7 @@ require github.com/go-chi/chi v1.5.5
 
 require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/go-chi/httprate v0.8.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect

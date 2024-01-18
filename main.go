@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
 	"github.com/go-chi/httprate"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
@@ -25,7 +26,16 @@ func main() {
 
 	fmt.Println("Initialize chi")
 	r := chi.NewRouter()
-
+	r.Use(cors.Handler(cors.Options{
+		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
+		AllowedOrigins: []string{"https://*", "http://*"},
+		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
@@ -89,13 +99,18 @@ func getAllCofeeShop(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsonData, err := json.MarshalIndent(results, "", "    ")
+	geoJSONResponse := map[string]interface{}{
+		"type":     "FeatureCollection",
+		"features": results,
+	}
+
+	responseData, err := json.MarshalIndent(geoJSONResponse, "", "    ")
 	if err != nil {
 		panic(err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonData)
+	w.Write(responseData)
 }
 
 // func getCoffeeShopByName(w http.ResponseWriter, r *http.Request) {
